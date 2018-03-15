@@ -1,4 +1,4 @@
-;(function($, window) {
+;(function(window) {
     'use strict';
 
     if (window.snapshots.config.isRecordingSnapshots && !window.snapshots.config.currentStep) {
@@ -9,6 +9,21 @@
         console.log('📹 Watching step ' + window.snapshots.config.currentStep + ' of recorded session ' + window.snapshots.config.sessionId);
     }
 
+    window.snapshots.request = function(url, callbackSuccess, callbackError) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    callbackSuccess();
+                } else {
+                    callbackError();
+                }
+            }
+        };
+    };
+
     window.snapshots.record = function() {
         var me = this;
 
@@ -18,18 +33,17 @@
             return;
         }
 
-        $.ajax({
-            'method': 'GET',
-            'url': me.config.startUrl,
-            'success': function () {
+        me.request(
+            me.config.startUrl,
+            function () {
                 me.config.isRecordingSnapshots = true;
 
                 console.log('▶️️ Recording of session starting next request. Session ID: ' + me.config.sessionId);
             },
-            'error': function () {
+            function () {
                 console.log('⚠️ Error while starting the recording of session.');
             }
-        });
+        );
     };
 
     window.snapshots.stop = function() {
@@ -41,18 +55,17 @@
             return;
         }
 
-        $.ajax({
-            'method': 'GET',
-            'url': me.config.stopUrl,
-            'success': function () {
+        me.request(
+            me.config.stopUrl,
+            function () {
                 me.config.isRecordingSnapshots = false;
 
                 console.log('✋️️ Stopped recording current session.');
             },
-            'error': function () {
+            function () {
                 console.log('⚠️ Error while stopping the recording of session.');
             }
-        });
+        );
     };
 
     window.snapshots.next = function() {
@@ -64,7 +77,7 @@
             return;
         }
 
-        console.log('⬅️️ Loading next snapshot.');
+        console.log('➡️️ Loading next snapshot.');
 
         window.location.href = me.config.nextUrl;
     };
@@ -78,9 +91,9 @@
             return;
         }
 
-        console.log('➡️️ Loading previous snapshot.');
+        console.log('⬅️️ Loading previous snapshot.');
 
         window.location.href = me.config.prevUrl;
     };
 
-})(jQuery, window);
+})(window);

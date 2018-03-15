@@ -2,7 +2,6 @@
 
 namespace DnViewSnapshots\Subscriber;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Enlight\Event\SubscriberInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -60,8 +59,7 @@ class Dispatch implements SubscriberInterface
     {
         return [
             'Enlight_Controller_Action_PreDispatch' => 'onPreDispatch',
-            'Theme_Compiler_Collect_Plugin_Javascript' => 'addJsFiles',
-            'Enlight_Controller_Action_PostDispatch_Frontend' => 'onFrontendPostDispatch',
+            'Enlight_Controller_Action_PostDispatchSecure' => 'onPostDispatchSecure',
         ];
     }
 
@@ -71,24 +69,17 @@ class Dispatch implements SubscriberInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     */
-    public function addJsFiles()
-    {
-        $jsFiles = [
-            $this->pluginDirectory . '/Resources/views/frontend/_public/src/js/jquery.view-snapshots.js',
-        ];
-
-        return new ArrayCollection($jsFiles);
-    }
-
-    /**
      * @param \Enlight_Controller_ActionEventArgs $args
      */
-    public function onFrontendPostDispatch(\Enlight_Controller_ActionEventArgs $args)
+    public function onPostDispatchSecure(\Enlight_Controller_ActionEventArgs $args)
     {
         $view = $args->getSubject()->View();
         $request = $args->getSubject()->Request();
+
+        if (strtolower($request->getModuleName()) !== 'frontend') {
+            return;
+        }
+
         $params = $request->getParams();
         $sessionID = $this->container->get('session')->get('sessionId');
 
@@ -108,8 +99,7 @@ class Dispatch implements SubscriberInterface
         if (
             $snapshotSessionID ||
             !$isSessionRecorded ||
-            $request->isXmlHttpRequest() ||
-            !$request->isDispatched()
+            $request->isXmlHttpRequest()
         )
         {
             return;
@@ -125,7 +115,7 @@ class Dispatch implements SubscriberInterface
                     // workaround for PDOException when trying to serialize PDO instances
                     serialize($value);
                 }
-                catch (\Exception $e) {
+                catch (\Throwable $e) {
                     // as we only need a snapshot for the view, remove the PDO instance
                     $value = null;
                 }
