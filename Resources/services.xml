@@ -5,10 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="dn_view_snapshots.subscriber.dispatch" class="DnViewSnapshots\Subscriber\Dispatch">
+        <service id="dn_view_snapshots.subscriber.template_registration" class="DnViewSnapshots\Subscriber\TemplateRegistration">
             <argument>%dn_view_snapshots.plugin_dir%</argument>
             <argument type="service" id="template"/>
-            <argument type="service" id="service_container" />
+            <tag name="shopware.event_subscriber"/>
+        </service>
+        <service id="dn_view_snapshots.subscriber.dispatch" class="DnViewSnapshots\Subscriber\Dispatch">
+            <argument type="service" id="session" />
             <argument type="service" id="dbal_connection"/>
             <tag name="shopware.event_subscriber"/>
         </service>

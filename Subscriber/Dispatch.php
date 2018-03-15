@@ -4,7 +4,6 @@ namespace DnViewSnapshots\Subscriber;
 
 use Doctrine\DBAL\Connection;
 use Enlight\Event\SubscriberInterface;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class Dispatch
@@ -13,19 +12,9 @@ use Symfony\Component\DependencyInjection\Container;
 class Dispatch implements SubscriberInterface
 {
     /**
-     * @var string
+     * @var \Enlight_Components_Session_Namespace
      */
-    private $pluginDirectory;
-
-    /**
-     * @var \Enlight_Template_Manager
-     */
-    private $templateManager;
-
-    /**
-     * @var Container
-     */
-    private $container;
+    private $session;
 
     /**
      * @var Connection
@@ -34,21 +23,15 @@ class Dispatch implements SubscriberInterface
 
     /**
      * Dispatch constructor.
-     * @param $pluginDirectory
-     * @param \Enlight_Template_Manager $templateManager
-     * @param Container $container
+     * @param \Enlight_Components_Session_Namespace $session
      * @param Connection $connection
      */
     public function __construct(
-        $pluginDirectory,
-        \Enlight_Template_Manager $templateManager,
-        Container $container,
+        \Enlight_Components_Session_Namespace $session,
         Connection $connection
     )
     {
-        $this->pluginDirectory = $pluginDirectory;
-        $this->templateManager = $templateManager;
-        $this->container = $container;
+        $this->session = $session;
         $this->connection = $connection;
     }
 
@@ -58,33 +41,22 @@ class Dispatch implements SubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_PreDispatch' => 'onPreDispatch',
-            'Enlight_Controller_Action_PostDispatchSecure' => 'onPostDispatchSecure',
+            'Enlight_Controller_Action_PostDispatchSecure_Frontend' => 'onPostDispatchSecureFrontend',
         ];
-    }
-
-    public function onPreDispatch()
-    {
-        $this->templateManager->addTemplateDir($this->pluginDirectory . '/Resources/views');
     }
 
     /**
      * @param \Enlight_Controller_ActionEventArgs $args
      */
-    public function onPostDispatchSecure(\Enlight_Controller_ActionEventArgs $args)
+    public function onPostDispatchSecureFrontend(\Enlight_Controller_ActionEventArgs $args)
     {
         $view = $args->getSubject()->View();
         $request = $args->getSubject()->Request();
-
-        if (strtolower($request->getModuleName()) !== 'frontend') {
-            return;
-        }
-
         $params = $request->getParams();
-        $sessionID = $this->container->get('session')->get('sessionId');
+        $sessionID = $this->session->get('sessionId');
 
         $isSessionRecorded = strtolower($request->getControllerName()) !== 'snapshots' ?
-            $this->container->get('session')->get('isSessionRecorded') :
+            $this->session->get('isSessionRecorded') :
             false;
 
         $snapshotSessionID = $view->getAssign('snapshotSessionID');
