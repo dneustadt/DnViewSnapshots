@@ -57,3 +57,17 @@ JavaScript console to issue commands:
 ```
 > snapshots.prev()
 ```
+
+## Installation
+
+* Clone this repository into a folder **DnViewSnapshots** within the **custom/plugins** directory of the Shopware installation.
+* Install the plugin through the Plugin-Manager within the Shopware backend.
+
+### Install with composer
+* Change to your root installation of shopware
+* Run command `composer require dneustadt/dn-view-snapshots` and install and activate plugin with Plugin Manager 
+
+## Requirements
+
+* Shopware 5.3.4 or higher
+* PHP 7.0
