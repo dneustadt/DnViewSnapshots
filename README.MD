@@ -1,5 +1,8 @@
 # View Snapshots
 
+[![Scrutinizer](https://scrutinizer-ci.com/g/dneustadt/DnViewSnapshots/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dneustadt/DnViewSnapshots/?branch=master)
+[![Travis CI](https://travis-ci.org/dneustadt/DnViewSnapshots.svg?branch=master)](https://travis-ci.org/dneustadt/DnViewSnapshots)
+
 View Snapshots is a plugin for shopware that allows you to record/log requests
 continiously. It will record snapshots of variables passed to the view and
 will persist them in serialized form to the database. Also persisted is the
