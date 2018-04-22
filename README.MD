@@ -1,5 +1,7 @@
 # View Snapshots
 
+> **Discontinued** - migrated to [FroshViewSnapshots](https://github.com/FriendsOfShopware/FroshViewSnapshots)
+
 [![Scrutinizer](https://scrutinizer-ci.com/g/dneustadt/DnViewSnapshots/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dneustadt/DnViewSnapshots/?branch=master)
 [![Travis CI](https://travis-ci.org/dneustadt/DnViewSnapshots.svg?branch=master)](https://travis-ci.org/dneustadt/DnViewSnapshots)
 
